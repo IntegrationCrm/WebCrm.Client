@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Integration Crm Application Ruleset" ToolsVersion="14.0">
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <Rule Id="CS3001" Action="None" />
+    <Rule Id="CS3002" Action="None" />
+    <Rule Id="CS3009" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.DocumentationRules">
+    <Rule Id="SA1633" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.MaintainabilityRules">
+    <Rule Id="SA1413" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.NamingRules">
+    <Rule Id="SA1309" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.ReadabilityRules">
+    <Rule Id="SA1101" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpecialRules">
+    <Rule Id="SA0001" Action="None" />
+  </Rules>
+</RuleSet>
