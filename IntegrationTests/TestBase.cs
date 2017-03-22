@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using IntegrationTests.Contact;
 using WebCrm.Client;
 using WebCrm.Client.Entities;
 using WebCrm.Client.Repository;
 
-namespace IntegrationTests.Contact
+namespace IntegrationTests
 {
     public class TestBase
     {
@@ -15,18 +16,14 @@ namespace IntegrationTests.Contact
 
         public void SetUpBase()
         {
-
             CustomMappingBuilder
-               <CustomContact, WebCrm.Client.Entities.Contact, WebCrm.Client.Entities.Contact.CustomFields> builder =
-                   Context.CustomiseContact<CustomContact>();
+                <CustomContact, WebCrm.Client.Entities.Contact, WebCrm.Client.Entities.Contact.CustomFields> builder =
+                    Context.CustomiseContact<CustomContact>();
 
             builder.AddMapping(c => c.EmailConfirmedRaw, WebCrm.Client.Entities.Contact.CustomFields.p_pcust13);
             builder.Build();
 
-
             ContactRepository = new CustomContactRepository();
-
-
 
             OrganisationRepository = new Repository<Organisation>();
         }

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using IntegrationTests.Contact;
+using IntegrationTests.Opportunity;
 using IntegrationTests.Repositories;
 using NUnit.Framework;
 using WebCrm.Client;
 using WebCrm.Client.Entities;
 using WebCrm.Client.Repository;
 
-namespace IntegrationTests.Opportunity
+namespace IntegrationTests
 {
     [TestFixture]
     public class OpportunityTests : TestBase
@@ -42,6 +43,23 @@ namespace IntegrationTests.Opportunity
 
         [Test]
         public void TestAdd()
+        {
+            CustomOpportunity customOpportunity = CreateOpportunity();
+
+            CustomOpportunity savedOpportunity = _repository.GetById(customOpportunity.WebCrmId);
+
+            Assert.That(savedOpportunity.Description, Is.EqualTo(customOpportunity.Description));
+            Assert.That(savedOpportunity.PotentialAnnualRevenue, Is.EqualTo(customOpportunity.PotentialAnnualRevenue));
+            Assert.That(savedOpportunity.OrganisationId, Is.EqualTo(customOpportunity.OrganisationId));
+            Assert.That(savedOpportunity.Currency, Is.EqualTo(customOpportunity.Currency));
+            Assert.That(savedOpportunity.DeliveryAddress, Is.EqualTo(customOpportunity.DeliveryAddress));
+            Assert.That(savedOpportunity.OpportunityType, Is.EqualTo(customOpportunity.OpportunityType));
+            Assert.That(savedOpportunity.OrderDate, Is.EqualTo(customOpportunity.OrderDate));
+            Assert.That(savedOpportunity.WinProbability, Is.EqualTo(customOpportunity.WinProbability));
+            Assert.That(savedOpportunity.KeyContactId, Is.EqualTo(customOpportunity.KeyContactId));
+        }
+
+        private CustomOpportunity CreateOpportunity()
         {
             KeyValuePair type = _repository.GetLookUp(c => c.OpportunityType).First();
             KeyValuePair levels = _repository.GetLookUp(c => c.Level).First();
@@ -94,28 +112,27 @@ namespace IntegrationTests.Opportunity
                     opportunity => opportunity.WinProbability
                 };
 
-            long id = _repository.Add(customOpportunity, columns);
+            var id = _repository.Add(customOpportunity, columns);
 
-            CustomOpportunity savedOpportunity = _repository.GetById(id);
+            customOpportunity.WebCrmId = id;
 
-            Assert.That(savedOpportunity.Description, Is.EqualTo(customOpportunity.Description));
-            Assert.That(savedOpportunity.PotentialAnnualRevenue, Is.EqualTo(customOpportunity.PotentialAnnualRevenue));
-            Assert.That(savedOpportunity.WebCrmId, Is.EqualTo(id));
-            Assert.That(savedOpportunity.OrganisationId, Is.EqualTo(customOpportunity.OrganisationId));
-            Assert.That(savedOpportunity.Currency, Is.EqualTo(customOpportunity.Currency));
-            Assert.That(savedOpportunity.DeliveryAddress, Is.EqualTo(customOpportunity.DeliveryAddress));
-            Assert.That(savedOpportunity.OpportunityType, Is.EqualTo(customOpportunity.OpportunityType));
-            Assert.That(savedOpportunity.OrderDate, Is.EqualTo(customOpportunity.OrderDate));
-            Assert.That(savedOpportunity.WinProbability, Is.EqualTo(customOpportunity.WinProbability));
-            Assert.That(savedOpportunity.KeyContactId, Is.EqualTo(customOpportunity.KeyContactId));
+            return customOpportunity;
         }
 
         public void TestAddDocument()
         {
         }
 
+        [Test]
         public void TestGetByName()
         {
+            var newOpportunity = CreateOpportunity();
+
+            var opportunityById = _repository.GetById(newOpportunity.WebCrmId);
+
+            var opportunityByName = _repository.GetByName(opportunityById.OpportunityNumber);
+
+            Assert.That(opportunityByName.WebCrmId, Is.EqualTo(opportunityById.WebCrmId));
         }
 
         [Test]
