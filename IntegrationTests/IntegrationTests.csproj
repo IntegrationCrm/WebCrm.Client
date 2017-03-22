@@ -47,9 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contact\ContactTests.cs" />
-    <Compile Include="Contact\CustomContact.cs" />
-    <Compile Include="Contact\CustomContactRepository.cs" />
+    <Compile Include="ContactTests.cs" />
+    <Compile Include="Entities\CustomContact.cs" />
+    <Compile Include="Repositories\CustomContactRepository.cs" />
+    <Compile Include="TestBase.cs" />
+    <Compile Include="Entities\CustomOpportunity.cs" />
+    <Compile Include="Repositories\CustomOpportunityRepository.cs" />
+    <Compile Include="Opportunity\OpportunityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

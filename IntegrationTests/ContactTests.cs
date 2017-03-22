@@ -3,36 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using IntegrationTests.Contact;
 using NUnit.Framework;
 using WebCrm.Client;
-using WebCrm.Client.Entities;
-using WebCrm.Client.Repository;
 
-namespace IntegrationTests.Contact
+namespace IntegrationTests
 {
     [TestFixture]
-    public class ContactTests
+    public class ContactTests : TestBase
     {
-        private Expression<Func<Organisation, object>>[] _columns;
-
-        private CustomContactRepository _contactRepository;
-
-        private Repository<Organisation> _organisationRepository;
-
         [OneTimeSetUp]
         public void SetUp()
         {
             Context.Initialise("cm25202tRCWof", "markhoxtontech", "markhoxtontech");
 
-            CustomMappingBuilder
-                <CustomContact, WebCrm.Client.Entities.Contact, WebCrm.Client.Entities.Contact.CustomFields> builder =
-                    Context.CustomiseContact<CustomContact>();
+           
 
-            builder.AddMapping(c => c.EmailConfirmedRaw, WebCrm.Client.Entities.Contact.CustomFields.p_pcust13);
-            builder.Build();
-
-            _contactRepository = new CustomContactRepository();
-            _organisationRepository = new Repository<Organisation>();
+            SetUpBase();
         }
 
         [Test]
@@ -47,7 +34,7 @@ namespace IntegrationTests.Contact
 
             long contactId = AddContact(customContact);
 
-            CustomContact newContact = _contactRepository.GetById(contactId);
+            CustomContact newContact = ContactRepository.GetById(contactId);
 
             Assert.That(newContact.FirstName, Is.EqualTo(newContact.FirstName));
         }
@@ -61,7 +48,7 @@ namespace IntegrationTests.Contact
 
             byte[] bArray = File.ReadAllBytes(directoryName + "\\debug\\Test Document.docx");
 
-            long? organisation = _organisationRepository.ResolveId("Integration Crm");
+            long? organisation = OrganisationRepository.ResolveId("Integration Crm");
 
             if (organisation == null)
             {
@@ -78,7 +65,7 @@ namespace IntegrationTests.Contact
 
             long id = AddContact(customContact);
 
-            long documentId = _contactRepository.AddDocument(
+            long documentId = ContactRepository.AddDocument(
                 bArray,
                 organisation.Value,
                 "description",
@@ -87,7 +74,7 @@ namespace IntegrationTests.Contact
                 string.Empty,
                 id);
 
-            ReadDocumentDataResult document = _contactRepository.ReadDocument(documentId);
+            ReadDocumentDataResult document = ContactRepository.ReadDocument(documentId);
 
             Assert.That(document.Document.FileName, Is.EqualTo(test.Name));
         }
@@ -104,7 +91,7 @@ namespace IntegrationTests.Contact
 
             long contactId = AddContact(customContact);
 
-            WebCrm.Client.Entities.Contact contact = _contactRepository.GetById(contactId);
+            WebCrm.Client.Entities.Contact contact = ContactRepository.GetById(contactId);
 
             Assert.That(contact.WebCrmId, Is.EqualTo(contactId));
         }
@@ -121,7 +108,7 @@ namespace IntegrationTests.Contact
 
             AddContact(customContact);
 
-            WebCrm.Client.Entities.Contact contact = _contactRepository.GetByName("First Last");
+            WebCrm.Client.Entities.Contact contact = ContactRepository.GetByName("First Last");
 
             Assert.That(contact.FullName, Is.EqualTo("First Last"));
         }
@@ -129,7 +116,7 @@ namespace IntegrationTests.Contact
         [Test]
         public void TestLog()
         {
-            long? organisation = _organisationRepository.ResolveId("Integration Crm");
+            long? organisation = OrganisationRepository.ResolveId("Integration Crm");
 
             if (organisation == null)
             {
@@ -146,13 +133,13 @@ namespace IntegrationTests.Contact
 
             long id = AddContact(customContact);
 
-            _contactRepository.Log(id, organisation.Value, "Test log");
+            ContactRepository.Log(id, organisation.Value, "Test log");
         }
 
         [Test]
         public void TestLookUp()
         {
-            IEnumerable<KeyValuePair> division = _contactRepository.GetLookUp(c => c.Division);
+            IEnumerable<KeyValuePair> division = ContactRepository.GetLookUp(c => c.Division);
 
             Assert.That(division.Count(), Is.GreaterThan(0));
         }
@@ -173,7 +160,7 @@ namespace IntegrationTests.Contact
             customContact.Mobile_telephone = "1234";
             customContact.WebCrmId = contactId;
 
-            _contactRepository.Update(
+            ContactRepository.Update(
                 customContact,
                 new List<Expression<Func<CustomContact, object>>>
                 {
@@ -181,43 +168,10 @@ namespace IntegrationTests.Contact
                     contact => contact.Mobile_telephone
                 });
 
-            CustomContact updateContact = _contactRepository.GetById(contactId);
+            CustomContact updateContact = ContactRepository.GetById(contactId);
 
             Assert.That(updateContact.EmailConfirmedRaw, Is.EqualTo("Yes"));
             Assert.That(updateContact.Mobile_telephone, Is.EqualTo("1234"));
-        }
-
-        private long AddContact(CustomContact customContact)
-        {
-            long? organisationId = _organisationRepository.ResolveId("Integration Crm");
-
-            if (organisationId == null)
-            {
-                var organisation = new Organisation
-                {
-                    Name = "Integration Crm"
-                };
-
-                _columns = new Expression<Func<Organisation, object>>[]
-                {
-                    organisation1 => organisation1.Name
-                };
-
-                organisationId = _organisationRepository.Add(organisation, _columns);
-            }
-
-            customContact.OrganisationId = organisationId.Value;
-
-            IEnumerable<Expression<Func<CustomContact, object>>> contactColumns = new List
-                <Expression<Func<CustomContact, object>>>
-                {
-                    contact => contact.FirstName,
-                    contact => contact.LastName,
-                    contact => contact.Email
-                };
-
-            long contactResult = _contactRepository.Add(customContact, contactColumns);
-            return contactResult;
         }
     }
 }

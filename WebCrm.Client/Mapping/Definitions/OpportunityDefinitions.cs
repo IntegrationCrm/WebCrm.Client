@@ -131,10 +131,8 @@ namespace WebCrm.Client.Mapping.Definitions
 
         public override string Id => Opportunity.BaseFields.opportunity_id.ToString();
 
-        public override string NameClause
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override string NameClause => Opportunity.BaseFields.op_number + "= '{0}'";
+
 
         public override string Table
             =>
