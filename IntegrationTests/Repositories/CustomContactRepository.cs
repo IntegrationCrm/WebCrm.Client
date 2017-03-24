@@ -1,4 +1,5 @@
-﻿using WebCrm.Client.Repository;
+﻿using IntegrationTests.Entities;
+using WebCrm.Client.Repository;
 
 namespace IntegrationTests.Contact
 {

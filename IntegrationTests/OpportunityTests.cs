@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using IntegrationTests.Contact;
-using IntegrationTests.Opportunity;
+using IntegrationTests.Entities;
 using IntegrationTests.Repositories;
 using NUnit.Framework;
 using WebCrm.Client;
@@ -14,18 +13,30 @@ using WebCrm.Client.Repository;
 namespace IntegrationTests
 {
     [TestFixture]
+    public class OrganisationTests : TestBase
+    {
+
+
+        public void SetUp()
+        {
+            
+        }
+    }
+
+
+    [TestFixture]
     public class OpportunityTests : TestBase
     {
+        private KeyValuePair _currency;
+        private KeyValuePair _level;
         private Repository<Organisation> _organisationRepository;
         private CustomOpportunityRepository _repository;
-        private KeyValuePair currencies;
-        private KeyValuePair levels;
-        private KeyValuePair type;
-        private KeyValuePair winProbability;
-        private KeyValuePair updatedType;
-        private KeyValuePair updatedLevels;
-        private KeyValuePair updatedcurrencies;
-        private KeyValuePair updatedwinProbability;
+        private KeyValuePair _type;
+        private KeyValuePair _updatedCurrency;
+        private KeyValuePair _updatedLevel;
+        private KeyValuePair _updatedType;
+        private KeyValuePair _updatedwinProbability;
+        private KeyValuePair _winProbability;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -33,15 +44,15 @@ namespace IntegrationTests
             Context.Initialise("cm25202tRCWof", "markhoxtontech", "markhoxtontech");
 
             CustomMappingBuilder
-                <CustomOpportunity, WebCrm.Client.Entities.Opportunity, WebCrm.Client.Entities.Opportunity.CustomFields>
+                <CustomOpportunity, Opportunity, Opportunity.CustomFields>
                 customMappingBuilder = Context.CustomiseOpportunity<CustomOpportunity>();
 
             customMappingBuilder
-                .AddMapping(c => c.DeliveryAddress, WebCrm.Client.Entities.Opportunity.CustomFields.op_custom9)
-                .AddMapping(c => c.PotentialAnnualRevenue, WebCrm.Client.Entities.Opportunity.CustomFields.op_pcust14)
+                .AddMapping(c => c.DeliveryAddress, Opportunity.CustomFields.op_custom9)
+                .AddMapping(c => c.PotentialAnnualRevenue, Opportunity.CustomFields.op_pcust14)
                 .AddLookUpMapping(
                     c => c.OpportunityType,
-                    WebCrm.Client.Entities.Opportunity.CustomFields.op_pcust1,
+                    Opportunity.CustomFields.op_pcust1,
                     c => c.OpportunityTypeDescription).Build();
 
             _repository = new CustomOpportunityRepository();
@@ -49,16 +60,15 @@ namespace IntegrationTests
 
             SetUpBase();
 
-            type = _repository.GetLookUp(c => c.OpportunityType).First();
-            levels = _repository.GetLookUp(c => c.Level).First();
-            currencies = _repository.GetLookUp(c => c.Currency).First();
-            winProbability = _repository.GetLookUp(c => c.WinProbability).First();
-            
-            updatedType = _repository.GetLookUp(c => c.OpportunityType).Skip(1).First();
-            updatedLevels = _repository.GetLookUp(c => c.Level).Skip(1).First();
-            updatedcurrencies = _repository.GetLookUp(c => c.Currency).Skip(1).First();
-            updatedwinProbability = _repository.GetLookUp(c => c.WinProbability).Skip(1).First();
+            _type = _repository.GetLookUp(c => c.OpportunityType).First();
+            _level = _repository.GetLookUp(c => c.Level).First();
+            _currency = _repository.GetLookUp(c => c.Currency).First();
+            _winProbability = _repository.GetLookUp(c => c.WinProbability).First();
 
+            _updatedType = _repository.GetLookUp(c => c.OpportunityType).Skip(1).First();
+            _updatedLevel = _repository.GetLookUp(c => c.Level).Skip(1).First();
+            _updatedCurrency = _repository.GetLookUp(c => c.Currency).Skip(1).First();
+            _updatedwinProbability = _repository.GetLookUp(c => c.WinProbability).Skip(1).First();
         }
 
         [Test]
@@ -131,13 +141,13 @@ namespace IntegrationTests
             CustomOpportunity customOpportunity = CreateOpportunity();
 
             customOpportunity.PotentialAnnualRevenue = 12345;
-            customOpportunity.Currency = updatedcurrencies.Key;
+            customOpportunity.Currency = _updatedCurrency.Key;
             customOpportunity.DeliveryAddress = "1 Smith Street 1234";
             customOpportunity.Description = "This is a description 1234";
-            customOpportunity.Level = updatedLevels.Key;
-            customOpportunity.OpportunityType = updatedType.Key;
+            customOpportunity.Level = _updatedLevel.Key;
+            customOpportunity.OpportunityType = _updatedType.Key;
             customOpportunity.OrderDate = DateTime.Now;
-            customOpportunity.WinProbability = updatedwinProbability.Key;
+            customOpportunity.WinProbability = _updatedwinProbability.Key;
 
             IEnumerable<Expression<Func<CustomOpportunity, object>>> columns = new List
                 <Expression<Func<CustomOpportunity, object>>>
@@ -191,15 +201,15 @@ namespace IntegrationTests
             {
                 PotentialAnnualRevenue = 1234,
                 OrganisationId = organisationId.Value,
-                Currency = currencies.Key,
+                Currency = _currency.Key,
                 DeliveryAddress = "1 Smith Street",
                 Description = "This is a description",
                 KeyContactId = contactId,
-                Level = levels.Key,
-                OpportunityType = type.Key,
+                Level = _level.Key,
+                OpportunityType = _type.Key,
                 OrderDate = DateTime.Now,
                 OpportunityNumber = "-1",
-                WinProbability = winProbability.Key
+                WinProbability = _winProbability.Key
             };
 
             IEnumerable<Expression<Func<CustomOpportunity, object>>> columns = new List

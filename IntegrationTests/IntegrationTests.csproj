@@ -49,7 +49,9 @@
   <ItemGroup>
     <Compile Include="ContactTests.cs" />
     <Compile Include="Entities\CustomContact.cs" />
+    <Compile Include="Entities\CustomOrganisation.cs" />
     <Compile Include="Repositories\CustomContactRepository.cs" />
+    <Compile Include="Repositories\CustomOrganisationRepository.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Entities\CustomOpportunity.cs" />
     <Compile Include="Repositories\CustomOpportunityRepository.cs" />

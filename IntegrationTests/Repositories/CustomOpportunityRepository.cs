@@ -1,4 +1,4 @@
-using IntegrationTests.Opportunity;
+using IntegrationTests.Entities;
 using WebCrm.Client.Repository;
 
 namespace IntegrationTests.Repositories

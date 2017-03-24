@@ -1,4 +1,4 @@
-namespace IntegrationTests.Contact
+namespace IntegrationTests.Entities
 {
     public class CustomContact : WebCrm.Client.Entities.Contact
     {

@@ -1,4 +1,4 @@
-﻿namespace IntegrationTests.Opportunity
+﻿namespace IntegrationTests.Entities
 {
     public class CustomOpportunity : WebCrm.Client.Entities.Opportunity
     {
