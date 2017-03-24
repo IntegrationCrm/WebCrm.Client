@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using IntegrationTests.Contact;
@@ -17,6 +18,14 @@ namespace IntegrationTests
     {
         private Repository<Organisation> _organisationRepository;
         private CustomOpportunityRepository _repository;
+        private KeyValuePair currencies;
+        private KeyValuePair levels;
+        private KeyValuePair type;
+        private KeyValuePair winProbability;
+        private KeyValuePair updatedType;
+        private KeyValuePair updatedLevels;
+        private KeyValuePair updatedcurrencies;
+        private KeyValuePair updatedwinProbability;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -39,6 +48,17 @@ namespace IntegrationTests
             _organisationRepository = new Repository<Organisation>();
 
             SetUpBase();
+
+            type = _repository.GetLookUp(c => c.OpportunityType).First();
+            levels = _repository.GetLookUp(c => c.Level).First();
+            currencies = _repository.GetLookUp(c => c.Currency).First();
+            winProbability = _repository.GetLookUp(c => c.WinProbability).First();
+            
+            updatedType = _repository.GetLookUp(c => c.OpportunityType).Skip(1).First();
+            updatedLevels = _repository.GetLookUp(c => c.Level).Skip(1).First();
+            updatedcurrencies = _repository.GetLookUp(c => c.Currency).Skip(1).First();
+            updatedwinProbability = _repository.GetLookUp(c => c.WinProbability).Skip(1).First();
+
         }
 
         [Test]
@@ -59,13 +79,98 @@ namespace IntegrationTests
             Assert.That(savedOpportunity.KeyContactId, Is.EqualTo(customOpportunity.KeyContactId));
         }
 
+        [Test]
+        public void TestAddDocument()
+        {
+            byte[] bArray;
+            FileInfo test = GetDocument(out bArray);
+
+            CustomOpportunity opportunity = CreateOpportunity();
+
+            long documentId = _repository.AddDocument(
+                bArray,
+                opportunity.OrganisationId,
+                "description",
+                test.Extension,
+                test.Name,
+                string.Empty,
+                opportunity.WebCrmId);
+
+            ReadDocumentDataResult document = _repository.ReadDocument(documentId);
+
+            Assert.That(document.Document.FileName, Is.EqualTo(test.Name));
+
+            Assert.That(document.Document.LinkedEntityType, Is.EqualTo((long)Document.DocumentLinkTypes.Delivery));
+
+            Assert.That(document.Document.LinkedEntityId, Is.EqualTo(opportunity.WebCrmId));
+        }
+
+        [Test]
+        public void TestGetByName()
+        {
+            CustomOpportunity newOpportunity = CreateOpportunity();
+
+            CustomOpportunity opportunityById = _repository.GetById(newOpportunity.WebCrmId);
+
+            CustomOpportunity opportunityByName = _repository.GetByName(opportunityById.OpportunityNumber);
+
+            Assert.That(opportunityByName.WebCrmId, Is.EqualTo(opportunityById.WebCrmId));
+        }
+
+        [Test]
+        public void TestOpportunityTypeLookUp()
+        {
+            IEnumerable<KeyValuePair> types = _repository.GetLookUp(c => c.OpportunityType);
+
+            Assert.That(types.Count(), Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestUpdate()
+        {
+            CustomOpportunity customOpportunity = CreateOpportunity();
+
+            customOpportunity.PotentialAnnualRevenue = 12345;
+            customOpportunity.Currency = updatedcurrencies.Key;
+            customOpportunity.DeliveryAddress = "1 Smith Street 1234";
+            customOpportunity.Description = "This is a description 1234";
+            customOpportunity.Level = updatedLevels.Key;
+            customOpportunity.OpportunityType = updatedType.Key;
+            customOpportunity.OrderDate = DateTime.Now;
+            customOpportunity.WinProbability = updatedwinProbability.Key;
+
+            IEnumerable<Expression<Func<CustomOpportunity, object>>> columns = new List
+                <Expression<Func<CustomOpportunity, object>>>
+                {
+                    c => c.PotentialAnnualRevenue,
+                    opportunity => opportunity.Currency,
+                    opportunity => opportunity.DeliveryAddress,
+                    opportunity => opportunity.Description,
+                    opportunity => opportunity.KeyContactId,
+                    opportunity => opportunity.Level,
+                    opportunity => opportunity.OpportunityType,
+                    opportunity => opportunity.OrderDateRaw,
+                    opportunity => opportunity.OpportunityNumber,
+                    opportunity => opportunity.WinProbability
+                };
+
+            _repository.Update(customOpportunity, columns);
+
+            CustomOpportunity savedOpportunity = _repository.GetById(customOpportunity.WebCrmId);
+
+            Assert.That(savedOpportunity.Description, Is.EqualTo(customOpportunity.Description));
+            Assert.That(savedOpportunity.PotentialAnnualRevenue, Is.EqualTo(customOpportunity.PotentialAnnualRevenue));
+            Assert.That(savedOpportunity.OrganisationId, Is.EqualTo(customOpportunity.OrganisationId));
+            Assert.That(savedOpportunity.Currency, Is.EqualTo(customOpportunity.Currency));
+            Assert.That(savedOpportunity.DeliveryAddress, Is.EqualTo(customOpportunity.DeliveryAddress));
+            Assert.That(savedOpportunity.OpportunityType, Is.EqualTo(customOpportunity.OpportunityType));
+            Assert.That(savedOpportunity.OrderDate, Is.EqualTo(customOpportunity.OrderDate));
+            Assert.That(savedOpportunity.WinProbability, Is.EqualTo(customOpportunity.WinProbability));
+            Assert.That(savedOpportunity.KeyContactId, Is.EqualTo(customOpportunity.KeyContactId));
+        }
+
         private CustomOpportunity CreateOpportunity()
         {
-            KeyValuePair type = _repository.GetLookUp(c => c.OpportunityType).First();
-            KeyValuePair levels = _repository.GetLookUp(c => c.Level).First();
-            KeyValuePair currencies = _repository.GetLookUp(c => c.Currency).First();
-            KeyValuePair winProbability = _repository.GetLookUp(c => c.WinProbability).First();
-
             long? organisationId = _organisationRepository.ResolveId("Integration Crm");
 
             if (organisationId == null)
@@ -112,39 +217,11 @@ namespace IntegrationTests
                     opportunity => opportunity.WinProbability
                 };
 
-            var id = _repository.Add(customOpportunity, columns);
+            long id = _repository.Add(customOpportunity, columns);
 
             customOpportunity.WebCrmId = id;
 
             return customOpportunity;
-        }
-
-        public void TestAddDocument()
-        {
-        }
-
-        [Test]
-        public void TestGetByName()
-        {
-            var newOpportunity = CreateOpportunity();
-
-            var opportunityById = _repository.GetById(newOpportunity.WebCrmId);
-
-            var opportunityByName = _repository.GetByName(opportunityById.OpportunityNumber);
-
-            Assert.That(opportunityByName.WebCrmId, Is.EqualTo(opportunityById.WebCrmId));
-        }
-
-        [Test]
-        public void TestOpportunityTypeLookUp()
-        {
-            IEnumerable<KeyValuePair> types = _repository.GetLookUp(c => c.OpportunityType);
-
-            Assert.That(types.Count(), Is.GreaterThan(0));
-        }
-
-        public void TestUpdate()
-        {
         }
     }
 }

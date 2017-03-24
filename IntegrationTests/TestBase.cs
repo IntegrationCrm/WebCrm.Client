@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq.Expressions;
 using IntegrationTests.Contact;
+using NUnit.Framework;
 using WebCrm.Client;
 using WebCrm.Client.Entities;
 using WebCrm.Client.Repository;
@@ -10,6 +12,16 @@ namespace IntegrationTests
 {
     public class TestBase
     {
+        protected static FileInfo GetDocument(out byte[] bArray)
+        {
+            string directoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
+
+            var test = new FileInfo(directoryName + "\\debug\\Test Document.docx");
+
+            bArray = File.ReadAllBytes(directoryName + "\\debug\\Test Document.docx");
+            return test;
+        }
+
         protected CustomContactRepository ContactRepository { get; set; }
 
         protected Repository<Organisation> OrganisationRepository { get; set; }

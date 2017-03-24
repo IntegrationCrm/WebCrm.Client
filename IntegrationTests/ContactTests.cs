@@ -16,9 +16,7 @@ namespace IntegrationTests
         public void SetUp()
         {
             Context.Initialise("cm25202tRCWof", "markhoxtontech", "markhoxtontech");
-
-           
-
+            
             SetUpBase();
         }
 
@@ -42,11 +40,8 @@ namespace IntegrationTests
         [Test]
         public void TestAddDocument()
         {
-            string directoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
-
-            var test = new FileInfo(directoryName + "\\debug\\Test Document.docx");
-
-            byte[] bArray = File.ReadAllBytes(directoryName + "\\debug\\Test Document.docx");
+            byte[] bArray;
+            FileInfo test = GetDocument(out bArray);
 
             long? organisation = OrganisationRepository.ResolveId("Integration Crm");
 
@@ -78,6 +73,8 @@ namespace IntegrationTests
 
             Assert.That(document.Document.FileName, Is.EqualTo(test.Name));
         }
+
+        
 
         [Test]
         public void TestGetContactById()
