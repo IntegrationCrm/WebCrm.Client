@@ -1,7 +1,7 @@
 ﻿using IntegrationTests.Entities;
 using WebCrm.Client.Repository;
 
-namespace IntegrationTests.Contact
+namespace IntegrationTests.Repositories
 {
     public class CustomContactRepository : CustomRepository<CustomContact, WebCrm.Client.Entities.Contact>
     {

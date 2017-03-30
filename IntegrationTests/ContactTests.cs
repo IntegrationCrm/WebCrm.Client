@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using IntegrationTests.Contact;
 using IntegrationTests.Entities;
 using NUnit.Framework;
 using WebCrm.Client;

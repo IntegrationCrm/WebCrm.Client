@@ -89,6 +89,11 @@ namespace WebCrm.Client.Repository
             return QueryAllFields(where).FirstOrDefault();
         }
 
+        public IEnumerable<TEntity> GetAll()
+        {
+            return QueryAllFields(string.Empty);
+        }
+
         public virtual IEnumerable<KeyValuePair> GetLookUp(Expression<Func<TEntity, object>> column)
         {
             string columnName = ReflectionHelpers.GetName(column);

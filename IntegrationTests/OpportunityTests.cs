@@ -13,18 +13,6 @@ using WebCrm.Client.Repository;
 namespace IntegrationTests
 {
     [TestFixture]
-    public class OrganisationTests : TestBase
-    {
-
-
-        public void SetUp()
-        {
-            
-        }
-    }
-
-
-    [TestFixture]
     public class OpportunityTests : TestBase
     {
         private KeyValuePair _currency;
